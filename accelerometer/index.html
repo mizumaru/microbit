@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title></title>
+  </head>
+  <body>
+    <form name="js">
+      <input type="button" value="接続" onclick="connect();"/> 
+      <input type="button" value="切断" onclick="disconnect();"/> 
+      <br>
+      <label>X</label>
+      <input type="text" name="x" value=""/>
+      <br>
+      <label>Y</label>
+      <input type="text" name="y" value=""/>
+      <br>
+      <label>Z</label>
+      <input type="text" name="z" value=""/>
+    </form>
+  </body>
+</html>
+
+<script>
+  var bleDevice;
+  
+  //micro:bit BLE UUID
+  const SERVICE_ACCELEROMETER = 'e95d0753-251d-470a-a062-fa1922dfa9a8';
+  const CHAR_ACCELEROMETER_DATA = 'e95dca4b-251d-470a-a062-fa1922dfa9a8';
+  
+  function connect() {
+    navigator.bluetooth.requestDevice({
+      filters: [
+        { services: [SERVICE_ACCELEROMETER]},
+        { namePrefix: 'BBC micro:bit' }
+      ]
+    })
+    .then(device => {
+      bleDevice = device;
+      console.log("device", device);
+      return device.gatt.connect();
+    })
+    .then(server =>{
+      console.log("server", server)
+      return server.getPrimaryService(SERVICE_ACCELEROMETER);
+    })
+    .then(service => {
+      console.log("service", service)
+      return service.getCharacteristic(CHAR_ACCELEROMETER_DATA);
+    })
+    .then(ch => {
+      characteristic = ch;
+      characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged',onAccelerometerValueChanged);  
+      alert("BLE接続完了");
+    })  
+    .catch(error => {
+      alert("BLE接続失敗");
+      console.log(error);
+    });    
+  }
+  
+  function onAccelerometerValueChanged(event) {
+    document.js.x.value = event.target.value.getUint16(0)/1000.0;
+    document.js.y.value = event.target.value.getUint16(2)/1000.0;
+    document.js.z.value = event.target.value.getUint16(4)/1000.0;
+  } 
+  
+  function disconnect() {
+    if (!bleDevice || !bleDevice.gatt.connected) return ;
+    bleDevice.gatt.disconnect();
+    alert("BLE接続切断")
+  }
+</script> 
