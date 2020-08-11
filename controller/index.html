@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title></title>
+  </head>
+
+  <body>
+    <input type="button" value="接続" onclick="connect();">
+    <input type="button" value="切断" onclick="disconnect();">
+    <br><br>
+    <form name="controller">
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(1);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(2);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(3);"↗︎/>
+      <br>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(4);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(5);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(6);"/>
+      <br>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(7);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(8);"/>
+      <input type="button" style="width:50px; height:50px" value="" onclick="sendcmd(9);"/>
+    </form>
+  </body>
+</html>
+
+<script>
+  var bleDevice;
+  
+  //micro:bit BLE UUID
+  const SERVICE_UART = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+  const CHAR_RX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+  
+  function connect() {
+    navigator.bluetooth.requestDevice({
+      filters: [
+        { services: [SERVICE_UART]},
+        { namePrefix: 'BBC micro:bit' }
+      ]
+    })
+    .then(device => {
+      bleDevice = device;
+      console.log("device", device);
+      return device.gatt.connect();
+    })
+    .then(server =>{
+      console.log("server", server);
+      return server.getPrimaryService(SERVICE_UART);
+    })
+    .then(service => {
+      console.log("service", service);
+      return service.getCharacteristic(CHAR_RX);
+    })
+    .then(ch => {
+      console.log("ACCELEROMETER:", ch)
+      characteristic = ch;
+      alert("BLE接続完了");
+    })  
+    .catch(error => {
+      alert("BLE接続失敗");
+      console.log(error);
+    });
+  }
+  
+  function disconnect() {
+    if (!bleDevice || !bleDevice.gatt.connected) return ;
+    bleDevice.gatt.disconnect();
+    alert("BLE接続切断")
+  }
+  
+  function send() {
+    if (!bleDevice || !bleDevice.gatt.connected || !characteristic) return;
+    characteristic.writeValue(new Uint8Array(new TextEncoder().encode(test.msg.value)))
+  }
+
+  function sendcmd(num) {
+    if (!bleDevice || !bleDevice.gatt.connected || !characteristic) return;
+
+    if(num == 1) 
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("fl\n")))
+    else if(num == 2)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("f\n")))
+    else if(num == 3)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("fr\n")))
+    else if(num == 4)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("l\n")))
+    else if(num == 5)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("s\n")))
+    else if(num == 6)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("r\n")))
+    else if(num == 7)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("bl\n")))
+    else if(num == 8)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("b\n")))
+    else if(num == 9)
+      characteristic.writeValue(new Uint8Array(new TextEncoder().encode("br\n")))
+  }
+</script>    
