@@ -27,57 +27,66 @@
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(1);"
+        onmousedown="startSending(1);"
+        onmouseup="stopSending();"
       />
       <input
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(2);"
+        onmousedown="startSending(2);"
+        onmouseup="stopSending();"
       />
       <input
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(3);"
-      />
-      <br />
-      <input
-        type="button"
-        class="command-button"
-        value=""
-        onclick="sendcmd(4);"
-      />
-      <input
-        type="button"
-        class="command-button"
-        value=""
-        onclick="sendcmd(5);"
-      />
-      <input
-        type="button"
-        class="command-button"
-        value=""
-        onclick="sendcmd(6);"
+        onmousedown="startSending(3);"
+        onmouseup="stopSending();"
       />
       <br />
       <input
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(7);"
+        onmousedown="startSending(4);"
+        onmouseup="stopSending();"
       />
       <input
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(8);"
+        onmousedown="startSending(5);"
+        onmouseup="stopSending();"
       />
       <input
         type="button"
         class="command-button"
         value=""
-        onclick="sendcmd(9);"
+        onmousedown="startSending(6);"
+        onmouseup="stopSending();"
+      />
+      <br />
+      <input
+        type="button"
+        class="command-button"
+        value=""
+        onmousedown="startSending(7);"
+        onmouseup="stopSending();"
+      />
+      <input
+        type="button"
+        class="command-button"
+        value=""
+        onmousedown="startSending(8);"
+        onmouseup="stopSending();"
+      />
+      <input
+        type="button"
+        class="command-button"
+        value=""
+        onmousedown="startSending(9);"
+        onmouseup="stopSending();"
       />
     </form>
   </body>
@@ -89,6 +98,8 @@
   //micro:bit BLE UUID
   const SERVICE_UART = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
   const CHAR_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+
+  let sendInterval;
 
   function connect() {
     navigator.bluetooth
@@ -138,41 +149,57 @@
   function sendcmd(num) {
     if (!bleDevice || !bleDevice.gatt.connected || !characteristic) return;
 
-    if (num == 1)
+    if (num == 1) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("fl\n"))
       );
-    else if (num == 2)
+    } else if (num == 2) {
+      console.log("f");
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("f\n"))
       );
-    else if (num == 3)
+    } else if (num == 3) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("fr\n"))
       );
-    else if (num == 4)
+    } else if (num == 4) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("l\n"))
       );
-    else if (num == 5)
+    } else if (num == 5) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("s\n"))
       );
-    else if (num == 6)
+    } else if (num == 6) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("r\n"))
       );
-    else if (num == 7)
+    } else if (num == 7) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("bl\n"))
       );
-    else if (num == 8)
+    } else if (num == 8) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("b\n"))
       );
-    else if (num == 9)
+    } else if (num == 9) {
       characteristic.writeValue(
         new Uint8Array(new TextEncoder().encode("br\n"))
       );
+    } else {
+      characteristic.writeValue(
+        new Uint8Array(new TextEncoder().encode("s\n"))
+      );
+    }
+  }
+
+  function startSending(num) {
+    if (!bleDevice || !bleDevice.gatt.connected || !characteristic) return;
+    sendcmd(num);
+  }
+
+  function stopSending() {
+    clearInterval(sendInterval);
+    sendcmd(0);
   }
 </script>
