@@ -105,6 +105,7 @@
   const CHAR_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 
   let sendInterval;
+  let isKeyDown = false;
 
   function connect() {
     navigator.bluetooth
@@ -207,4 +208,27 @@
     clearInterval(sendInterval);
     sendcmd(0);
   }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowUp" && !isKeyDown) {
+      sendcmd(2);
+      isKeyDown = true;
+    }
+    if (event.key === "ArrowRight" && !isKeyDown) {
+      sendcmd(6);
+      isKeyDown = true;
+    }
+    if (event.key === "ArrowDown" && !isKeyDown) {
+      sendcmd(8);
+      isKeyDown = true;
+    }
+    if (event.key === "ArrowLeft" && !isKeyDown) {
+      sendcmd(4);
+      isKeyDown = true;
+    }
+    if (event.key === " ") {
+      sendcmd(5);
+      isKeyDown = false;
+    }
+  });
 </script>
